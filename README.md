@@ -38,8 +38,8 @@ Testes de usabilidade e desempenho foram realizados com 43 participantes, abrang
 ## 🚀 Como Usar
 
 ### Pré-requisitos
-- Python 3.8 ou superior  
-- PostgreSQL configurado  
+- Python 3.9 ou superior  
+- MySQL configurado  
 - Google Maps API Key  
 - Ambiente virtual configurado  
 
