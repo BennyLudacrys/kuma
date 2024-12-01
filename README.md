@@ -15,7 +15,8 @@ Este repositório contém o código-fonte do **Sistema Integrado de Apoip a Pess
 ## 🛠️ Tecnologias Utilizadas
 
 - **Back-End**: Django (Python)  
-- **Banco de Dados**: PostgreSQL  
+- **Banco de Dados**: MySQL
+- **Armazenamento de Imagens**: Cloudinary
 - **Reconhecimento Facial**: OpenCV e TensorFlow  
 - **Geolocalização**: APIs do Google Maps  
 - **Interface Web**: HTML, CSS, JavaScript  
