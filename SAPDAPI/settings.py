@@ -13,6 +13,7 @@ from datetime import timedelta
 from pathlib import Path
 import os
 
+import dj_database_url
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -134,35 +135,43 @@ WSGI_APPLICATION = 'SAPDAPI.wsgi.application'
 
 import pymysql
 pymysql.install_as_MySQLdb()
-DATABASES = {
-    'default': {
-        'NAME': 'apisapd',
-        'ENGINE': 'mysql.connector.django',
-        'HOST': 'localhost',
-        'PORT': 3300,
-        'USER': 'root',
-        'PASSWORD': '',
-
-        'OPTIONS': {
-           'autocommit': True,
-        },
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'NAME': 'railway',
+#         'NAME': 'apisapd',
 #         'ENGINE': 'mysql.connector.django',
-#         'HOST': 'kuma.mysql.pythonanywhere-services.com',
-#         'PORT': 6830,
-#         'USER': 'kuma',
-#         'PASSWORD': 'mocambique',
+#         'HOST': 'localhost',
+#         'PORT': 3300,
+#         'USER': 'root',
+#         'PASSWORD': '',
 #
 #         'OPTIONS': {
 #            'autocommit': True,
 #         },
 #     }
 # }
+
+# DATABASES = {
+#     'default': {
+#         'NAME': 'railway',
+#         'ENGINE': 'mysql.connector.django',
+#         'HOST': 'mysql.railway.internal',
+#         'PORT': 3306,
+#         'USER': 'root',
+#         'PASSWORD': 'krWqeEJmNELbiAwXBECJgHpdqjAchPrd',
+#
+#         'OPTIONS': {
+#            'autocommit': True,
+#         },
+#     }
+# }
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,  # Tempo para manter a conexão aberta
+
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
