@@ -40,7 +40,6 @@ jupyterlab_widgets
 matplotlib-inline
 multidict
 mysql-connector-python
-mysqlclient
 numpy
 packaging
 parso
