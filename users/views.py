@@ -1,5 +1,6 @@
 import cloudinary
 from cloudinary.uploader import upload
+from cloudinary.utils import cloudinary_url
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -22,6 +23,15 @@ cloudinary.config(
     api_secret=CLOUDINARY_STORAGE['API_SECRET']
 )
 
+# Função auxiliar para obter a URL completa da imagem
+def get_picture_url(picture_name):
+    if picture_name:
+        # Constrói a URL manualmente com a pasta desejada
+        picture_url = f"http://res.cloudinary.com/{CLOUDINARY_STORAGE['CLOUD_NAME']}/image/upload/v1/photos/{picture_name}"
+        return picture_url
+    return None
+
+
 
 class AuthUserAPIView(GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -43,7 +53,8 @@ class RegisterAPIView(GenericAPIView):
 
         if serializer.is_valid():
             if image_file:
-                cloudinary_response = cloudinary_upload(image_file, folder='photos')
+                # cloudinary_response = cloudinary_upload(image_file, folder='photos')
+                cloudinary_response = cloudinary.uploader.upload(image_file, folder='photos')
                 if cloudinary_response and 'secure_url' in cloudinary_response:
                     picture_url = cloudinary_response['secure_url']
 
@@ -85,10 +96,9 @@ class LoginAPIView(GenericAPIView):
 
 def cloudinary_upload(image_file, folder):
     try:
-        cloudinary_response = upload(image_file, folder=folder)
+        cloudinary_response = cloudinary.uploader.upload(image_file, folder=folder)
         return cloudinary_response
     except Exception as e:
-        # Tratar erros de upload aqui
         print("Erro ao fazer upload para o Cloudinary:", e)
         return None
 
@@ -98,6 +108,11 @@ class UpdateUserAPIView(RetrieveUpdateAPIView):
     serializer_class = UpdateUserSerializer
 
     def get_object(self):
+        import os
+
+        print(os.getenv('CLOUDINARY_CLOUD_NAME'))
+        print(os.getenv('CLOUDINARY_API_KEY'))
+        print(os.getenv('CLOUDINARY_API_SECRET'))
         return self.request.user
 
     def update(self, request, *args, **kwargs):
@@ -106,21 +121,29 @@ class UpdateUserAPIView(RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
+        # Verifica se há uma nova imagem para upload
         image_file = request.data.get('picture')
         if image_file:
             cloudinary_response = cloudinary_upload(image_file, folder='photos')
             if cloudinary_response and 'secure_url' in cloudinary_response:
                 picture_url = cloudinary_response['secure_url']
-
+                # Extrai o nome do arquivo salvo no Cloudinary
                 picture_url = picture_url.split("photos/")[-1]
                 serializer.validated_data['picture'] = picture_url
+
         else:
             # Se nenhuma nova imagem for fornecida, mantenha a imagem existente
             serializer.validated_data['picture'] = instance.picture
 
         self.perform_update(serializer)
 
+        # Atualiza a URL completa da imagem no campo de resposta
+        data = serializer.data
+        data['picture'] = get_picture_url(data['picture'])
+
         if getattr(instance, '_prefetched_objects_cache', None):
             instance._prefetched_objects_cache = {}
 
         return response.Response(serializer.data)
+
+

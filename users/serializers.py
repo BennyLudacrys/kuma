@@ -1,3 +1,4 @@
+from cloudinary.utils import cloudinary_url
 from rest_framework import serializers
 from .models import User
 
@@ -17,10 +18,22 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     representation['picture'] = instance.picture.url  # Obter a URL da imagem sem duplicações
-    #     return representation
+    # Função auxiliar para gerar a URL completa
+    def get_picture_url(self, picture_name):
+        # Gera o URL completo da imagem com o nome do arquivo
+        if picture_name:
+            picture_url, _ = cloudinary_url(f'photos/{picture_name}')
+            return picture_url
+        return None
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        # Se o usuário tem uma imagem, obtenha a URL completa
+        if instance.picture:
+            representation['picture'] = self.get_picture_url(instance.picture)
+
+        return representation
 
 
 class LoginSerializer(serializers.ModelSerializer):

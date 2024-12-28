@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from cloudinary.models import CloudinaryField
 from django.apps import apps
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
@@ -71,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingModel):
     alternativePhoneNumber = models.CharField(_("alternativePhoneNumber"), max_length=255, blank=True)
     first_name = models.CharField(_("first name"), max_length=150, blank=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True)
-    picture = models.ImageField(upload_to='person_pictures', blank=True)
+    picture = CloudinaryField('person_pictures', blank=True)
     email = models.EmailField(_("email address"), blank=False, unique=True)
     is_staff = models.BooleanField(
         _("staff status"),

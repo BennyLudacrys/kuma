@@ -1,3 +1,4 @@
+from cloudinary.models import CloudinaryField
 from helpers.models import TrackingModel
 from django.db import models
 from users.models import User
@@ -29,7 +30,7 @@ class Post(TrackingModel):
     cellphone1 = models.CharField(max_length=255, blank=True)
     description = models.TextField()
     disease = models.CharField(max_length=255, blank=True)
-    picture = models.ImageField(upload_to='person_pictures')
+    picture = CloudinaryField('person_pictures')
     status = models.CharField(max_length=255, blank=True)
     is_complete = models.BooleanField(default=False, blank=True)
     owner = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='owned_posts', null=True)

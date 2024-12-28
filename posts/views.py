@@ -3,6 +3,7 @@ from datetime import datetime
 import cloudinary
 import django_filters
 from cloudinary.uploader import upload as cloudinary_upload
+from cloudinary.utils import cloudinary_url
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.filters import SearchFilter
@@ -15,17 +16,25 @@ from .models import Post
 from .serializers import PersonSerializer
 from comments.serializers import CommentSerializer
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'drxn8xsyi',
-    'API_KEY': '785413883832964',
-    'API_SECRET': 'FOiok4tpbRm3obrJ56EintpBlG8'
-}
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': 'drxn8xsyi',
+#     'API_KEY': '785413883832964',
+#     'API_SECRET': 'FOiok4tpbRm3obrJ56EintpBlG8'
+# }
+#
+# cloudinary.config(
+#     cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+#     api_key=CLOUDINARY_STORAGE['API_KEY'],
+#     api_secret=CLOUDINARY_STORAGE['API_SECRET']
+# )
 
-cloudinary.config(
-    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
-    api_key=CLOUDINARY_STORAGE['API_KEY'],
-    api_secret=CLOUDINARY_STORAGE['API_SECRET']
-)
+# Função auxiliar para gerar a URL completa
+def get_picture_url(picture_name):
+    # Gera o URL completo da imagem com o nome do arquivo
+    if picture_name:
+        picture_url, _ = cloudinary_url(f'photos/{picture_name}')
+        return picture_url
+    return None
 
 
 class PostFilter(django_filters.FilterSet):
@@ -176,7 +185,7 @@ def get_posts_by_user(request, user_id):
                 "cellphone1": post.cellphone1,
                 "description": post.description,
                 "disease": post.disease,
-                "picture": post.picture.url,
+                "picture": get_picture_url(post.picture),
                 'owner_picture': owner_picture_url_utf8 if owner_picture_url else None,
                 "status": post.status,
                 "is_complete": post.is_complete,
@@ -213,7 +222,7 @@ def get_post(request, post_id):
             "cellphone1": post.cellphone1,
             "description": post.description,
             "disease": post.disease,
-            "picture": post.picture.url,
+            "picture": get_picture_url(post.picture),
             "status": post.status,
             "is_complete": post.is_complete,
             'kinship': post.kinship,
@@ -246,7 +255,7 @@ def get_all_posts(request):
         post_data = []
         for post in posts:
             owner_picture = post.owner.picture
-            owner_picture_url = owner_picture.url if owner_picture and owner_picture.name else None
+            owner_picture_url = owner_picture.url if owner_picture else None
             owner_picture_url_utf8 = owner_picture_url.encode('utf-8').decode('utf-8') if owner_picture_url else None
             post_data.append({
                 'id': post.id,
@@ -263,13 +272,13 @@ def get_all_posts(request):
                 "cellphone1": post.cellphone1,
                 "description": post.description,
                 "disease": post.disease,
-                "picture": owner_picture_url_utf8,
+                "picture": get_picture_url(post.picture),
                 "status": post.status,
                 'kinship': post.kinship,
                 "is_complete": post.is_complete,
                 'owner_first_name': post.owner.first_name,
                 'owner_last_name': post.owner.last_name,
-                'owner_picture': owner_picture_url_utf8 if owner_picture_url else None,
+                'owner_picture': get_picture_url(owner_picture),
                 'province': post.province,
                 'block': post.block,
                 'neighborhood': post.neighborhood,
@@ -297,7 +306,7 @@ def get_posts_by_status(request):
         post_data = []
         for post in posts:
             owner_picture = post.owner.picture
-            owner_picture_url = owner_picture.url if owner_picture and owner_picture.name else None
+            owner_picture_url = owner_picture.url if owner_picture else None
             owner_picture_url_utf8 = owner_picture_url.encode('utf-8').decode('utf-8') if owner_picture_url else None
             post_data.append({
                 'id': post.id,
@@ -322,11 +331,11 @@ def get_posts_by_status(request):
                 'gender': post.gender,
                 'allergies': post.allergies,
                 'medical_conditions': post.medical_conditions,
-                'owner_picture': owner_picture_url_utf8 if owner_picture_url else None,
+                'owner_picture': get_picture_url(owner_picture),
                 'medications': post.medications,
                 'detected_by_count': post.get_detected_by_count(),
                 'get_comments_count': post.get_comments_count(),
-                "picture": post.picture.url,
+                "picture": get_picture_url(post.picture),
                 "status": post.status,
                 "is_complete": post.is_complete,
                 'owner_first_name': post.owner.first_name,
@@ -348,7 +357,7 @@ def get_free_posts(request):
         post_data = []
         for post in posts:
             owner_picture = post.owner.picture
-            owner_picture_url = owner_picture.url if owner_picture and owner_picture.name else None
+            owner_picture_url = owner_picture.url if owner_picture else None
             owner_picture_url_utf8 = owner_picture_url.encode('utf-8').decode('utf-8') if owner_picture_url else None
             post_data.append({
                 'id': post.id,
@@ -365,7 +374,7 @@ def get_free_posts(request):
                 "cellphone1": post.cellphone1,
                 "description": post.description,
                 "disease": post.disease,
-                "picture": post.picture.url,
+                "picture": get_picture_url(post.picture),
                 "status": post.status,
                 'kinship': post.kinship,
                 'province': post.province,
@@ -374,7 +383,7 @@ def get_free_posts(request):
                 'houseNumber': post.houseNumber,
                 'gender': post.gender,
                 'allergies': post.allergies,
-                'owner_picture': owner_picture_url_utf8 if owner_picture_url else None,
+                'owner_picture': get_picture_url(owner_picture),
                 'medical_conditions': post.medical_conditions,
                 'medications': post.medications,
                 "is_complete": post.is_complete,

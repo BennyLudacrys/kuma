@@ -13,11 +13,17 @@ from datetime import timedelta
 from pathlib import Path
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import cloudinary
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 MEDIA_URL = '/photos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "photos")
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
     'drf_yasg',
     'rest_framework_simplejwt',
     'rest_framework',
@@ -52,11 +60,11 @@ INSTALLED_APPS = [
     'posts',
     'comments',
     'facial_recognition',
-    'cloudinary_storage',
     'emergency_contact',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'drxn8xsyi',
@@ -64,15 +72,14 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': 'FOiok4tpbRm3obrJ56EintpBlG8'
 }
 
+
 cloudinary.config(
     cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
     api_key=CLOUDINARY_STORAGE['API_KEY'],
     api_secret=CLOUDINARY_STORAGE['API_SECRET']
 )
 
-CLOUDINARY_URL = 'cloudinary://785413883832964:FOiok4tpbRm3obrJ56EintpBlG8@drxn8xsyi'
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 MIDDLEWARE = [
